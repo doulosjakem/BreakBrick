@@ -4,20 +4,46 @@
     <meta charset="UTF-8" />
     <title>BreakBrick</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style type="text/css">
         body {
-            margin: 0;
+            margin-right: auto;
+            background-color: beige;
         }
+        
     </style>
 </head>
-<body>
-
+<body class="container mx-auto">
+<div class="">
+    <h1 id="display"> Level</h1>
+</div>
 <script type="text/javascript">
+      var score = 0;
+      var level = 1;
+      var display = "Level: " + level + " | Score: "+ score;
+      function displayText() {
+        display = "Level: " + level + " | Score: "+ score;
+      $("#display").text(display);
+      };
+      displayText();
+
+      function updateScore() {
+        score += 32;
+        displayText();
+      };
+      function updateLevel() {
+        level += 1;
+        displayText();
+      };
 
 class BrickBreak extends Phaser.Scene
 {
+  
     constructor ()
     {
+        
         super({ key: 'breakbrick' });
 
         this.bricks;
@@ -43,6 +69,7 @@ class BrickBreak extends Phaser.Scene
     this.load.image('red1', 'assets/red1.png');
 
     this.load.image('ball1', 'assets/ball2.png');
+         
     }
 
     create ()
@@ -54,14 +81,14 @@ class BrickBreak extends Phaser.Scene
 
         
         this.bricks = this.physics.add.staticGroup({
-            key: 'red1',
+            key: 'purple2',
             // 'purple2', 'purple1','blue1', 'teal1', 'green1'         
-            frame: [ 'blue1', 'red1', 'green1', 'yellow1', 'silver1', 'purple1' ],
+            frame: [ 'red1','purple2', 'purple1','blue1', 'teal1', 'green1'],
             frameQuantity: 10,
             gridAlign: { width: 10, height: 6, cellWidth: 64, cellHeight: 32, x: 112, y: 100 }
         });
        
-       
+        this.bricks.key = 'red1';
       
 
         this.ball = this.physics.add.image(400, 500, 'ball1').setCollideWorldBounds(true).setBounce(1);
@@ -69,27 +96,16 @@ class BrickBreak extends Phaser.Scene
 
         this.player = this.physics.add.image(400, 550,  'dude').setImmovable();
 
+        //Level and score       
+        // var score = 0;
+        // var level = 1;   
+        // var gameText;      
+        // var gameText = this.add.text(16, 16, display, { fontSize: '32px', fill: '#000' })
+
         //  Our colliders
         this.physics.add.collider(this.ball, this.bricks, this.hitBrick, null, this);
-        this.physics.add.collider(this.ball, this.player, this.hitplayer, null, this);
-
-
-        
-
-
-
-
-    //     red1 = this.physics.add.staticGroup({
-    //     key: 'red1',
-    //     repeat: 15,
-    //     setXY: { x: 100, y: 100, stepX: 40 }
-    //    })
-       
-    //    purple2 = this.physics.add.staticGroup({
-    //     key: 'purple2',
-    //     repeat: 15,
-    //     setXY: { x: 100, y: 150, stepX: 40 }
-    //    });
+        this.physics.add.collider(this.ball, this.player, this.hitplayer, null, this);        
+   
 
         //  Input events
         this.input.on('pointermove', function (pointer)
@@ -118,11 +134,15 @@ class BrickBreak extends Phaser.Scene
     }
 
     hitBrick (ball, brick)
-    {
+    {      
+        updateScore();
+        
         brick.disableBody(true, true);
+        
 
         if (this.bricks.countActive() === 0)
         {
+            updateLevel();
             this.resetLevel();
         }
     }
@@ -140,6 +160,7 @@ class BrickBreak extends Phaser.Scene
 
         this.bricks.children.each(brick =>
         {
+
 
             brick.enableBody(false, 0, 0, true, true);
 
@@ -166,7 +187,7 @@ class BrickBreak extends Phaser.Scene
         {
             //  Ball is perfectly in the middle
             //  Add a little random X to stop it bouncing straight up!
-            ball.setVelocityX(2 + Math.random() * 8);
+            // ball.setVelocityX(2 + Math.random() * 8);
         }
     }
 
